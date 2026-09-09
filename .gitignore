@@ -2,3 +2,20 @@ my_env
 db.sqlite3
 __pycache__
 frontEnd/
+
+# Python
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.env
+*.so
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.tox/
