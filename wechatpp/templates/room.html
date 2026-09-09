@@ -78,7 +78,8 @@ const chatbox = document.querySelector("#chatbox");
 
  
     const roomName= JSON.parse(document.getElementById('room_slug').textContent);
-    const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/"+ roomName +"/");
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const chatSocket = new WebSocket(protocol + window.location.host + "/ws/"+ roomName +"/");
     // const chatSocket = new WebSocket("ws://127.0.0.1:8000/ws/"+ roomName +"/");
     // alert(chatSocket);
     chatSocket.onopen = function (e) {
@@ -116,7 +117,11 @@ const chatbox = document.querySelector("#chatbox");
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
       var div = document.createElement("div");
-      div.innerHTML = "<b>" + data.username + "</b> : " + data.message;
+      var bold = document.createElement("b");
+      bold.textContent = data.username;
+      var textNode = document.createTextNode(" : " + data.message);
+      div.appendChild(bold);
+      div.appendChild(textNode);
 
       // Add class based on user authentication
       if (data.username === "{{ request.user.username }}") {
