@@ -1,20 +1,26 @@
-
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+import environ
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR points to the outer wechatpp/ project directory (where manage.py lives).
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Initialize django-environ
+env = environ.Env()
+
+# Read .env file if it exists
+_env_file = BASE_DIR / '.env'
+if _env_file.is_file():
+    environ.Env.read_env(str(_env_file), overwrite=False)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$!(z0fy)6hkx@q9q7u!zvu%3k+3tw=ogfdoptv%3ic&=j!x+*5'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-me')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -29,16 +35,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'chatapp',
-    
 ]
 
-ASGI_APPLICATION = 'wechatpp.asgi.application' 
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+ASGI_APPLICATION = 'wechatpp.asgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,18 +71,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'wechatpp.wsgi.application'
-
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
