@@ -34,11 +34,11 @@
             <form>
                 <div class="form-group">
                   {% if messages %}
-                  <div class="jumbotron" id="chatbox" style="padding: 1em 2px;max-height: 300px; overflow-y: scroll;
+                  <div class="chat-display" id="chatbox" style="padding: 1em 2px;max-height: 300px; overflow-y: scroll;
                 ">
                     
                       {% for message in messages %}
-                        <div class="chat-message {% if message.user == request.user %}text-right{% else %}text-left{% endif %}">
+                        <div class="chat-message {% if message.user == request.user %}text-end{% else %}text-start{% endif %}">
                           <b>{{ message.user.username }}</b> : {{ message.content }}<br>
                         </div>
                         {% endfor %}
@@ -46,7 +46,7 @@
                     
                   </div>
                   {% else %}
-                  <div class="jumbotron" id="chatbox" style="padding: 4px 2px;"></div>
+                  <div class="chat-display" id="chatbox" style="padding: 4px 2px;"></div>
                   <b style="color: white;">No Messages in this Room.</b>
                     {% endif %}
 
@@ -125,9 +125,9 @@ const chatbox = document.querySelector("#chatbox");
 
       // Add class based on user authentication
       if (data.username === "{{ request.user.username }}") {
-        div.classList.add("chat-message", "text-right");
+        div.classList.add("chat-message", "text-end");
       } else {
-        div.classList.add("chat-message", "text-left");
+        div.classList.add("chat-message", "text-start");
       }
 
       document.querySelector("#my_input").value = "";
