@@ -76,14 +76,16 @@ class TestMessageModel:
         """Test deleting a user cascades to delete their messages."""
         user = UserFactory()
         MessageFactory(user=user)
-        assert Message.objects.filter(user=user).count() == 1
+        user_pk = user.pk
+        assert Message.objects.filter(user_id=user_pk).count() == 1
         user.delete()
-        assert Message.objects.filter(user=user).count() == 0
+        assert Message.objects.filter(user_id=user_pk).count() == 0
 
     def test_message_room_cascade_delete(self):
         """Test deleting a room cascades to delete its messages."""
         room = RoomFactory()
         MessageFactory(room=room)
-        assert Message.objects.filter(room=room).count() == 1
+        room_pk = room.pk
+        assert Message.objects.filter(room_id=room_pk).count() == 1
         room.delete()
-        assert Message.objects.filter(room=room).count() == 0
+        assert Message.objects.filter(room_id=room_pk).count() == 0
