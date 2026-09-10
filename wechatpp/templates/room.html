@@ -34,11 +34,11 @@
             <form>
                 <div class="form-group">
                   {% if messages %}
-                  <div class="jumbotron" id="chatbox" style="padding: 1em 2px;max-height: 300px; overflow-y: scroll;
+                  <div class="chat-display" id="chatbox" style="padding: 1em 2px;max-height: 300px; overflow-y: scroll;
                 ">
                     
                       {% for message in messages %}
-                        <div class="chat-message {% if message.user == request.user %}text-right{% else %}text-left{% endif %}">
+                        <div class="chat-message {% if message.user == request.user %}text-end{% else %}text-start{% endif %}">
                           <b>{{ message.user.username }}</b> : {{ message.content }}<br>
                         </div>
                         {% endfor %}
@@ -46,7 +46,7 @@
                     
                   </div>
                   {% else %}
-                  <div class="jumbotron" id="chatbox" style="padding: 4px 2px;"></div>
+                  <div class="chat-display" id="chatbox" style="padding: 4px 2px;"></div>
                   <b style="color: white;">No Messages in this Room.</b>
                     {% endif %}
 
@@ -78,7 +78,8 @@ const chatbox = document.querySelector("#chatbox");
 
  
     const roomName= JSON.parse(document.getElementById('room_slug').textContent);
-    const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/"+ roomName +"/");
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const chatSocket = new WebSocket(protocol + window.location.host + "/ws/"+ roomName +"/");
     // const chatSocket = new WebSocket("ws://127.0.0.1:8000/ws/"+ roomName +"/");
     // alert(chatSocket);
     chatSocket.onopen = function (e) {
@@ -116,13 +117,17 @@ const chatbox = document.querySelector("#chatbox");
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
       var div = document.createElement("div");
-      div.innerHTML = "<b>" + data.username + "</b> : " + data.message;
+      var bold = document.createElement("b");
+      bold.textContent = data.username;
+      var textNode = document.createTextNode(" : " + data.message);
+      div.appendChild(bold);
+      div.appendChild(textNode);
 
       // Add class based on user authentication
       if (data.username === "{{ request.user.username }}") {
-        div.classList.add("chat-message", "text-right");
+        div.classList.add("chat-message", "text-end");
       } else {
-        div.classList.add("chat-message", "text-left");
+        div.classList.add("chat-message", "text-start");
       }
 
       document.querySelector("#my_input").value = "";

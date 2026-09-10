@@ -1,0 +1,30 @@
+[project]
+name = "wechatpp"
+version = "1.0.0"
+description = "Real-time chat application built with Django and Channels"
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=5.2,<5.3",
+    "channels>=4.3,<5",
+    "daphne>=4.2,<5",
+    "channels-redis>=4.3,<5",
+    "django-environ>=0.13,<1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-django",
+    "pytest-asyncio",
+    "pytest-cov",
+    "factory-boy",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "wechatpp.settings.development"
+asyncio_mode = "auto"
+pythonpath = ["wechatpp"]
+testpaths = ["wechatpp"]
+
+[tool.coverage.run]
+source = ["chatapp"]
