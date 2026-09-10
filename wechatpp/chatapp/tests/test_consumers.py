@@ -4,14 +4,7 @@ from channels.db import database_sync_to_async
 
 from wechatpp.consumers import ChatConsumer
 from chatapp.models import Message
-from chatapp.tests.factories import UserFactory, RoomFactory
-
-
-CHANNEL_LAYERS_SETTING = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    }
-}
+from chatapp.tests.factories import RoomFactory
 
 
 def _make_communicator(room_slug="test-room"):
@@ -25,17 +18,15 @@ def _make_communicator(room_slug="test-room"):
 class TestChatConsumerConnect:
     """Tests for ChatConsumer WebSocket connection."""
 
-    async def test_consumer_connect_accepts(self, settings):
+    async def test_consumer_connect_accepts(self):
         """Test that the consumer accepts a WebSocket connection."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
         communicator = _make_communicator()
         connected, _ = await communicator.connect()
         assert connected is True
         await communicator.disconnect()
 
-    async def test_consumer_disconnect(self, settings):
+    async def test_consumer_disconnect(self):
         """Test that the consumer disconnects cleanly."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
         communicator = _make_communicator()
         connected, _ = await communicator.connect()
         assert connected is True
@@ -47,10 +38,9 @@ class TestChatConsumerConnect:
 class TestChatConsumerMessaging:
     """Tests for ChatConsumer message send/receive flow."""
 
-    async def test_send_receive_message(self, settings):
+    async def test_send_receive_message(self, async_user):
         """Test sending a message and receiving the echo back via group."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
-        user = await database_sync_to_async(UserFactory)()
+        user = async_user
         await database_sync_to_async(RoomFactory)(name="TestRoom", slug="test-room")
 
         communicator = _make_communicator(room_slug="test-room")
@@ -71,10 +61,9 @@ class TestChatConsumerMessaging:
 
         await communicator.disconnect()
 
-    async def test_message_json_structure(self, settings):
+    async def test_message_json_structure(self, async_user):
         """Test that received messages have the expected JSON structure."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
-        user = await database_sync_to_async(UserFactory)()
+        user = async_user
         await database_sync_to_async(RoomFactory)(name="TestRoom", slug="test-room")
 
         communicator = _make_communicator(room_slug="test-room")
@@ -97,10 +86,9 @@ class TestChatConsumerMessaging:
 class TestChatConsumerGroupMessaging:
     """Tests for group messaging between multiple consumers in the same room."""
 
-    async def test_group_message_broadcast(self, settings):
+    async def test_group_message_broadcast(self, async_user):
         """Test that a message sent by one consumer is received by another in the same room."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
-        user = await database_sync_to_async(UserFactory)()
+        user = async_user
         await database_sync_to_async(RoomFactory)(name="TestRoom", slug="test-room")
 
         # Two communicators join the same room
@@ -134,10 +122,9 @@ class TestChatConsumerGroupMessaging:
 class TestChatConsumerSaveMessage:
     """Tests for the save_message functionality of ChatConsumer."""
 
-    async def test_save_message_creates_message_in_db(self, settings):
+    async def test_save_message_creates_message_in_db(self, async_user):
         """Test that sending a message via WebSocket creates a Message object in the database."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
-        user = await database_sync_to_async(UserFactory)()
+        user = async_user
         room = await database_sync_to_async(RoomFactory)(name="TestRoom", slug="test-room")
 
         communicator = _make_communicator(room_slug="test-room")
@@ -163,10 +150,9 @@ class TestChatConsumerSaveMessage:
 
         await communicator.disconnect()
 
-    async def test_save_message_correct_user_and_room(self, settings):
+    async def test_save_message_correct_user_and_room(self, async_user):
         """Test that saved message is associated with the correct user and room."""
-        settings.CHANNEL_LAYERS = CHANNEL_LAYERS_SETTING
-        user = await database_sync_to_async(UserFactory)()
+        user = async_user
         room = await database_sync_to_async(RoomFactory)(name="MyRoom", slug="my-room")
 
         communicator = _make_communicator(room_slug="my-room")
