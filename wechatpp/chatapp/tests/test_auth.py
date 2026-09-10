@@ -67,3 +67,21 @@ class TestAuthenticatedAccess:
         response = authenticated_client.get(reverse("rooms"))
         content = response.content.decode()
         assert "You are not logged in" not in content
+
+
+@pytest.mark.django_db
+class TestLogout:
+    """Tests for the logout flow."""
+
+    def test_logout_redirects_to_login(self, authenticated_client):
+        """Test that POST to logout redirects to LOGOUT_REDIRECT_URL."""
+        response = authenticated_client.post(reverse("logout"))
+        assert response.status_code == 302
+        assert reverse("login") in response.url
+
+    def test_logout_ends_session(self, authenticated_client):
+        """Test that after logout the user is no longer authenticated."""
+        authenticated_client.post(reverse("logout"))
+        response = authenticated_client.get(reverse("rooms"))
+        content = response.content.decode()
+        assert "You are not logged in" in content
