@@ -3,6 +3,8 @@ from .base import env
 
 DEBUG = False
 
+SECRET_KEY = env('SECRET_KEY')
+
 DATABASES = {
     'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')
 }
