@@ -1,11 +1,9 @@
-import json
-
 import pytest
 from channels.testing import WebsocketCommunicator
 from channels.db import database_sync_to_async
 
 from wechatpp.consumers import ChatConsumer
-from chatapp.models import Room, Message
+from chatapp.models import Message
 from chatapp.tests.factories import UserFactory, RoomFactory
 
 
