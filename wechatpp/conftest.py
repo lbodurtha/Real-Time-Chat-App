@@ -32,6 +32,13 @@ def room(db):
 
 
 @pytest.fixture
+def message(db, user, room):
+    """Create and return a test message associated with the test user and room."""
+    from chatapp.tests.factories import MessageFactory
+    return MessageFactory(user=user, room=room)
+
+
+@pytest.fixture
 def channel_layer():
     """Return the in-memory channel layer from settings."""
     from channels.layers import get_channel_layer
