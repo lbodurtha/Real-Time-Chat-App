@@ -10,12 +10,12 @@ class TestLoginPage:
 
     def test_login_page_accessible(self, client):
         """Test that GET /accounts/login/ returns HTTP 200."""
-        response = client.get("/accounts/login/")
+        response = client.get(reverse("login"))
         assert response.status_code == 200
 
     def test_login_page_uses_login_template(self, client):
         """Test that the login page renders the login template."""
-        response = client.get("/accounts/login/")
+        response = client.get(reverse("login"))
         template_names = [t.name for t in response.templates]
         assert "registration/login.html" in template_names
 
@@ -28,7 +28,7 @@ class TestLoginAuthentication:
         """Test that logging in with valid credentials redirects to '/'."""
         user = UserFactory(username="validuser")
         response = client.post(
-            "/accounts/login/",
+            reverse("login"),
             {"username": "validuser", "password": "testpass123"},
         )
         # LOGIN_REDIRECT_URL is "/" so expect a redirect
@@ -39,7 +39,7 @@ class TestLoginAuthentication:
         """Test that logging in with invalid credentials re-renders the form (200)."""
         UserFactory(username="validuser")
         response = client.post(
-            "/accounts/login/",
+            reverse("login"),
             {"username": "validuser", "password": "wrongpassword"},
         )
         # Invalid login stays on the login page (200, not a redirect)
