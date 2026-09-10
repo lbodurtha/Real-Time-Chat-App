@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from chatapp.tests.factories import UserFactory
+from chatapp.tests.factories import RoomFactory, UserFactory
 
 
 @pytest.mark.django_db
@@ -65,6 +65,20 @@ class TestAuthenticatedAccess:
     def test_authenticated_does_not_show_not_logged_in(self, authenticated_client):
         """Test that an authenticated user does NOT see 'not logged in' message."""
         response = authenticated_client.get(reverse("rooms"))
+        content = response.content.decode()
+        assert "You are not logged in" not in content
+
+    def test_room_unauthenticated_shows_not_logged_in(self, client):
+        """Test room detail view shows 'not logged in' for unauthenticated user."""
+        room = RoomFactory()
+        response = client.get(reverse("room", kwargs={"slug": room.slug}))
+        content = response.content.decode()
+        assert "You are not logged in" in content
+
+    def test_room_authenticated_shows_chat_ui(self, authenticated_client):
+        """Test room detail view shows chat UI for authenticated user."""
+        room = RoomFactory()
+        response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
         content = response.content.decode()
         assert "You are not logged in" not in content
 

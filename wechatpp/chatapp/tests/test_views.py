@@ -90,3 +90,14 @@ class TestRoomView:
         response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
         messages_in_context = list(response.context["messages"])
         assert len(messages_in_context) == 0
+
+    def test_room_view_returns_200_unauthenticated(self, client, room):
+        """Test room view returns HTTP 200 for an unauthenticated user."""
+        response = client.get(reverse("room", kwargs={"slug": room.slug}))
+        assert response.status_code == 200
+
+    def test_room_view_unauthenticated_shows_not_logged_in(self, client, room):
+        """Test unauthenticated user sees 'not logged in' content on room page."""
+        response = client.get(reverse("room", kwargs={"slug": room.slug}))
+        content = response.content.decode()
+        assert "You are not logged in" in content
