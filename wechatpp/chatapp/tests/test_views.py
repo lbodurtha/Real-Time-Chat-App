@@ -51,37 +51,31 @@ class TestRoomsView:
 class TestRoomView:
     """Tests for the room() view (single room detail)."""
 
-    def test_room_view_returns_200_authenticated(self, authenticated_client):
+    def test_room_view_returns_200_authenticated(self, authenticated_client, room):
         """Test room view returns HTTP 200 for an authenticated user."""
-        room = RoomFactory(name="TestRoom", slug="test-room")
         response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
         assert response.status_code == 200
 
-    def test_room_view_uses_correct_template(self, authenticated_client):
+    def test_room_view_uses_correct_template(self, authenticated_client, room):
         """Test room view renders the 'room.html' template."""
-        room = RoomFactory(name="TestRoom", slug="test-room")
         response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
         assert "room.html" in [t.name for t in response.templates]
 
-    def test_room_view_context_room_name(self, authenticated_client):
+    def test_room_view_context_room_name(self, authenticated_client, room):
         """Test room view context contains correct room_name."""
-        room = RoomFactory(name="TestRoom", slug="test-room")
         response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
-        assert response.context["room_name"] == "TestRoom"
+        assert response.context["room_name"] == room.name
 
-    def test_room_view_context_slug(self, authenticated_client):
+    def test_room_view_context_slug(self, authenticated_client, room):
         """Test room view context contains correct slug."""
-        room = RoomFactory(name="TestRoom", slug="test-room")
         response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
-        assert response.context["slug"] == "test-room"
+        assert response.context["slug"] == room.slug
 
-    def test_room_view_context_messages(self, authenticated_client):
+    def test_room_view_context_messages(self, authenticated_client, room):
         """Test room view context contains messages for the room."""
-        room = RoomFactory(name="TestRoom", slug="test-room")
         user = UserFactory()
         msg1 = MessageFactory(user=user, room=room, content="Hello")
         msg2 = MessageFactory(user=user, room=room, content="World")
-        # Create a message in a different room (should not appear)
         other_room = RoomFactory(name="Other", slug="other")
         MessageFactory(user=user, room=other_room, content="Not here")
 
@@ -91,9 +85,8 @@ class TestRoomView:
         assert msg2 in messages_in_context
         assert len(messages_in_context) == 2
 
-    def test_room_view_empty_messages(self, authenticated_client):
+    def test_room_view_empty_messages(self, authenticated_client, room):
         """Test room view with no messages shows empty queryset."""
-        room = RoomFactory(name="EmptyRoom", slug="empty-room")
         response = authenticated_client.get(reverse("room", kwargs={"slug": room.slug}))
         messages_in_context = list(response.context["messages"])
         assert len(messages_in_context) == 0
